@@ -1,0 +1,23 @@
+fx_version 'cerulean'
+rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aware my resources *will* become incompatible once RedM ships.'
+game 'rdr3'
+
+client_scripts {
+    "client/client.lua",
+}
+
+server_scripts {
+    "@mysql-async/lib/MySQL.lua",
+    "server/server.lua"
+}
+
+shared_scripts {
+    "config.lua",
+    "hairs.lua",
+    'overlays.lua',
+}
+
+dependency 'rsg-core'
+dependency 'rsg-menubase'
+
+lua54 'yes'
