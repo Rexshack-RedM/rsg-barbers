@@ -19,5 +19,6 @@ shared_scripts {
 
 dependency 'rsg-core'
 dependency 'rsg-menubase'
+dependency 'rsg-npcs'
 
 lua54 'yes'
