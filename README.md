@@ -1,3 +1,5 @@
+NOTICE : WIP PLEASE DO NOT USE IN PRODUCTION
+
 # RexshackGaming
 - discord : https://discord.gg/s5uSk56B65
 - github : https://github.com/Rexshack-RedM
