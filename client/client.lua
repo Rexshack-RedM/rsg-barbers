@@ -18,7 +18,7 @@ Citizen.CreateThread(function()
         local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, v.coords)
         SetBlipSprite(blip, -2090472724, 1)
         SetBlipScale(blip, 0.2)
-        Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.name.." Barber")
+        Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.name.. Lang:t('menu.barber'))
         exports['rsg-target']:AddCircleZone(v.name, v.coords, 1, {
             name = v.name,
             debugPoly = false,
@@ -30,7 +30,7 @@ Citizen.CreateThread(function()
                     TriggerEvent('rsg-barber:client:menu', v.location)
                     end,
                     icon = "fas fa-shopping-basket",
-                    label = "Open Barber",
+                    label = Lang:t('menu.open_barber'),
                 },
             },
             distance = 4.0,
@@ -94,9 +94,9 @@ function MainMenu(Target)
     }
     MenuData.Open('default', GetCurrentResourceName(), 'main_character_creator_menu',
         { 
-            title = "Barber Shop", 
-            subtext = Config.Texts.Options, 
-            align = Config.Texts.align, 
+            title = Lang:t('menu.barber_shop'),
+            subtext = Config.Texts.Options,
+            align = Config.Texts.align,
             elements = elements
         }, function(data, menu)
         MainMenus[data.current.value]()

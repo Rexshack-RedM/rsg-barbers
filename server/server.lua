@@ -169,8 +169,8 @@ AddEventHandler('rsg-barber:server:SaveSkinm', function(CreatorCache)
             end
             MySQL.Async.execute("UPDATE playerskins SET skin=(@skin) WHERE citizenid=(@characterid)", {['@skin'] = json.encode(skin), ['@characterid'] = charid})
         end)
-        RSGCore.Functions.Notify('You have purchased a new style!', 'success') 
+        RSGCore.Functions.Notify(Lang:t('success.you_have_purchase_new_style'), 'success') 
     else
-        RSGCore.Functions.Notify('you dont have enough money!', 'error')
+        RSGCore.Functions.Notify(Lang:t('error.you_dont_have_enough_money'), 'error')
     end
 end)
