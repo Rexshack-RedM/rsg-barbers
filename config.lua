@@ -3,8 +3,7 @@ Config = {}
 Config.DistanceSpawn = 20.0 -- Distance before spawning/despawning the ped. (GTA Units.)
 Config.FadeIn = true
 
-Config.BarberCostFemale = 5
-Config.BarberCostMale = 5
+Config.BarberCost = 5
 
 Config.barberlocations = {
     [1] = { name = "Valentine",   location = 'valentine',  coords = vector3(-307.96, 814.16, 118.99)},

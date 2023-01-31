@@ -54,7 +54,8 @@ RegisterNetEvent("rsg-barber:client:menu",function(location)
     end
 end)
 
-local MainMenus = {
+local MainMenus =
+{
     ["hair"] = function()
         OpenHairMenu()
     end,
@@ -63,15 +64,17 @@ local MainMenus = {
     end,
     ["save"] = function()
         MenuData.CloseAll()
+
         LoadedComponents = CreatorCache
         local ped = PlayerPedId()
-        if IsPedMale(ped) then 
-            ClearPedTasks(ped)
-            TriggerServerEvent("rsg-barber:server:SaveSkinm", CreatorCache)
-        else
-            ClearPedTasks(ped)
-            TriggerServerEvent("rsg-barber:server:SaveSkinf", CreatorCache)
+        local male = true
+
+        if not IsPedMale(ped) then
+            male = false
         end
+
+        ClearPedTasks(ped)
+        TriggerServerEvent("rsg-barber:server:SaveSkin", CreatorCache, male)
     end
 }
 
