@@ -11,6 +11,7 @@ local Translations = {
   menu = {
       open_barber = 'Open Barber',
       barber_shop = 'Barber Shop',
+      barber = ' Barber',
   },
   commands = {
       var = 'text goes here',
