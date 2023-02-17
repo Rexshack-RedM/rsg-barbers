@@ -1,12 +1,13 @@
-local RSGCore = exports['rsg-core']:GetCoreObject()
-
-ComponentsMale = {}
-ComponentsFemale = {}
-LoadedComponents = {}
-CreatorCache = {}
-local SpawnedPeds = {}
+local ComponentsMale = {}
+local ComponentsFemale = {}
+local CreatorCache = {}
+local blipEntries = {}
 local textureId = -1
-local overlay_opacity = 1.0
+local sit = false
+local cam = nil
+local camPos = nil
+local camRot = nil
+local lighting = nil
 
 MenuData = {}
 TriggerEvent('rsg-menubase:getData',function(call)
@@ -19,6 +20,7 @@ Citizen.CreateThread(function()
         SetBlipSprite(blip, -2090472724, 1)
         SetBlipScale(blip, 0.2)
         Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.name.. Lang:t('menu.barber'))
+        blipEntries[#blipEntries + 1] = {type = "BLIP", handle = blip}
         exports['rsg-target']:AddCircleZone(v.name, v.coords, 1, {
             name = v.name,
             debugPoly = false,
@@ -38,19 +40,36 @@ Citizen.CreateThread(function()
     end
 end)
 
-RegisterNetEvent("rsg-barber:client:menu",function(location)
+RegisterNetEvent("rsg-barber:client:menu", function()
     local ped = PlayerPedId()
-    if location == 'valentine' then
-        TaskStartScenarioAtPosition(ped, GetHashKey("PROP_PLAYER_BARBER_SEAT"), -306.45, 813.60, 118.95, 99.96, -1, true, 0)
-        MainMenu()
-    end
-    if location == 'stdenis' then
-        TaskStartScenarioAtPosition(ped, GetHashKey("PROP_PLAYER_BARBER_SEAT"), 2655.30, -1180.95, 53.01, 182.8, -1, true, 0)
-        MainMenu()
-    end
-    if location == 'blackwater' then
-        TaskStartScenarioAtPosition(ped, GetHashKey("PROP_PLAYER_BARBER_SEAT"), -815.3, -1367.018, 43.50, 90.60, -1, true, 0)
-        MainMenu()
+    local playerCoords = GetEntityCoords(ped)
+    local camFov = GetGameplayCamFov()
+    local seat = GetHashKey("PROP_PLAYER_BARBER_SEAT")
+
+    for i = 1, #Config.barberlocations do
+        local loc = Config.barberlocations[i]
+
+        if #(playerCoords - loc.coords) < 2 then
+            Citizen.InvokeNative(0x4D1F61FC34AF3CD1, ped, seat, loc.seat, 0, 0, 1)
+
+            camPos = loc.camPos
+            camRot = loc.camRot
+            lighting = loc.lighting
+
+            sit = true
+
+            ClearPedTasks(ped)
+            ClearPedSecondaryTask(ped)
+            FreezeEntityPosition(ped, true)
+
+            MainMenu()
+
+            cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
+            RenderScriptCams(true, true, 2000, true, true)
+            SetCamFov(cam, camFov)
+            SetCamCoord(cam, camPos)
+            SetCamRot(cam, camRot, 2)
+        end
     end
 end)
 
@@ -73,8 +92,26 @@ local MainMenus =
             male = false
         end
 
-        ClearPedTasks(ped)
         TriggerServerEvent("rsg-barber:server:SaveSkin", CreatorCache, male)
+
+        RenderScriptCams(false, true, 1000, true, true)
+        SetCamActive(cam, false)
+        DetachCam(cam)
+        DestroyCam(cam, true)
+
+        sit = false
+        cam = nil
+        lighting = nil
+
+        FreezeEntityPosition(ped, false)
+        ClearPedTasks(ped)
+        ClearPedSecondaryTask(ped)
+
+        Wait(1000)
+
+        TriggerServerEvent("rsg-appearance:LoadSkin")
+
+        CreatorCache = {}
     end
 }
 
@@ -105,7 +142,25 @@ function MainMenu(Target)
         MainMenus[data.current.value]()
         end, function(data, menu)
             menu.close()
-            TriggerServerEvent("rsg-appearance:LoadSkin")
+
+        RenderScriptCams(false, true, 2000, true, true)
+        SetCamActive(cam, false)
+        DetachCam(cam)
+        DestroyCam(cam, true)
+
+        sit = false
+        cam = nil
+        lighting = nil
+
+        FreezeEntityPosition(PlayerPedId(), false)
+        ClearPedTasks(PlayerPedId())
+        ClearPedSecondaryTask(PlayerPedId())
+
+        Wait(1000)
+
+        TriggerServerEvent("rsg-appearance:LoadSkin")
+
+        CreatorCache = {}
     end)
 end
 
@@ -489,3 +544,51 @@ function LoadOverlays(target, data)
     end
     ApplyOverlays(target)
 end
+
+-- Cameras & Lihtings
+CreateThread(function()
+    while true do
+        local t = 3000
+
+        if not sit then goto continue end
+
+        DrawLightWithRange(lighting, 255, 255, 255, 2.5, 50.0)
+        SetCamCoord(cam, camPos)
+        SetCamRot(cam, camRot, 2)
+
+        t = 4
+
+        ::continue::
+
+        Wait(t)
+    end
+end)
+
+-- Cleanup
+AddEventHandler("onResourceStop", function(resourceName)
+    if GetCurrentResourceName() ~= resourceName then return end
+
+    MenuData.CloseAll()
+
+    CreatorCache = {}
+    MenuData = {}
+
+    RenderScriptCams(false, true, 500, true, true)
+    SetCamActive(cam, false)
+    DetachCam(cam)
+    DestroyCam(cam, true)
+
+    sit = false
+    cam = nil
+    lighting = nil
+
+    ClearPedTasks(PlayerPedId())
+    ClearPedSecondaryTask(PlayerPedId())
+    FreezeEntityPosition(PlayerPedId(), false)
+
+    for i = 1, #blipEntries do
+        if blipEntries[i].type == "BLIP" then
+            RemoveBlip(blipEntries[i].handle)
+        end
+    end
+end)
