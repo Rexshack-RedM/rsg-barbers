@@ -24,6 +24,12 @@ AddEventHandler('rsg-barber:server:SaveSkin', function(CreatorCache, gender)
     local skin = {}
     skin = json.decode(result[1].skin)
 
+    if skin['hair'] == nil then
+        skin['hair'] = {}
+        skin['hair'].model = 0
+        skin['hair'].texture = 1
+    end
+
     if CreatorCache['hair'].model ~= nil then
         skin['hair'].model = tostring(CreatorCache['hair'].model)
     end
