@@ -1,9 +1,11 @@
 local Translations = {
   error = {
-      you_dont_have_enough_money = 'you dont have enough money!',
+      error_1 = 'Not Enough Money',
+      error_2 = 'you don\'t have enough money!',
   },
   success = {
-      you_have_purchase_new_style = 'You have purchased a new style!',
+      success_1 = 'New Style Purchased',
+      success_2 = 'you have purchased a new style!',
   },
   primary = {
       var = 'text goes here',
@@ -105,3 +107,6 @@ Lang = Locale:new({
     phrases = Translations,
     warnOnMissing = true
 })
+
+-- Lang:t('error.error_1')
+-- Lang:t('success.success_1')
