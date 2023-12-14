@@ -14,7 +14,9 @@ Config.barberlocations =
         seat = vector4(-306.62, 813.56, 118.75, 90.60),
         camPos = vector3(-307.35, 813.45, 119.61),
         camRot = vector3(-18.29, 0.0, -79.42),
-        lighting = vector3(-307.39, 813.43, 119.51)
+        lighting = vector3(-307.39, 813.43, 119.51),
+        showblip = true,
+        showtarget = true
     },
     [2] =
     {
@@ -23,7 +25,9 @@ Config.barberlocations =
         seat = vector4(2655.38, -1180.92, 53.00, 182.8),
         camPos = vector3(2655.38, -1181.69, 53.87),
         camRot = vector3(-16.55, 0.0, 2.01),
-        lighting = vector3(2655.35, -1182.23, 54.07)
+        lighting = vector3(2655.35, -1182.23, 54.07),
+        showblip = true,
+        showtarget = true
     },
     [3] =
     {
@@ -32,7 +36,9 @@ Config.barberlocations =
         seat = vector4(-815.17, -1368.75, 43.50, 95.5),
         camPos = vector3(-816.06, -1368.76, 44.26),
         camRot = vector3(-10.98, 0.0, -88.66),
-        lighting = vector3(-816.46, -1368.77, 44.26)
+        lighting = vector3(-816.46, -1368.77, 44.26),
+        showblip = true,
+        showtarget = true
     }
 }
 
