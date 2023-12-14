@@ -14,29 +14,39 @@ TriggerEvent('rsg-menubase:getData',function(call)
     MenuData = call
 end)
 
-Citizen.CreateThread(function()
+CreateThread(function()
     for k, v in pairs(Config.barberlocations) do
-        local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, v.coords)
-        SetBlipSprite(blip, -2090472724, 1)
-        SetBlipScale(blip, 0.2)
-        Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.name.. Lang:t('menu.barber'))
-        blipEntries[#blipEntries + 1] = {type = "BLIP", handle = blip}
-        exports['rsg-target']:AddCircleZone(v.name, v.coords, 1, {
-            name = v.name,
-            debugPoly = false,
-            }, {
-                options = {
-                {
-                    type = "client",
-                    action = function()
-                    TriggerEvent('rsg-barber:client:menu', v.location)
-                    end,
-                    icon = "fas fa-shopping-basket",
-                    label = Lang:t('menu.open_barber'),
+        if not v.showtarget then
+            exports['rsg-core']:createPrompt(v.name, v.coords, RSGCore.Shared.Keybinds[Config.Key], Lang:t('menu.open_barber'), {
+                type = 'client',
+                event = 'rsg-barber:client:menu',
+                args = { v.location },
+            })
+        else
+            exports['rsg-target']:AddCircleZone(v.name, v.coords, 1, {
+                name = v.name,
+                debugPoly = false,
+                }, {
+                    options = {
+                    {
+                        type = "client",
+                        action = function()
+                        TriggerEvent('rsg-barber:client:menu', v.location)
+                        end,
+                        icon = "fas fa-shopping-basket",
+                        label = Lang:t('menu.open_barber'),
+                    },
                 },
-            },
-            distance = 4.0,
-        })
+                distance = 4.0,
+            })
+        end
+        if v.showblip then
+            local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, v.coords)
+            SetBlipSprite(blip, -2090472724, 1)
+            SetBlipScale(blip, 0.2)
+            Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.name.. Lang:t('menu.barber'))
+            blipEntries[#blipEntries + 1] = {type = "BLIP", handle = blip}
+        end
     end
 end)
 
