@@ -1,3 +1,4 @@
+local RSGCore = exports['rsg-core']:GetCoreObject()
 local ComponentsMale = {}
 local ComponentsFemale = {}
 local CreatorCache = {}
