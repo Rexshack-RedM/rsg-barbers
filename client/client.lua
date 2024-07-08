@@ -103,7 +103,7 @@ local MainMenus =
             male = false
         end
 
-        TriggerServerEvent("rsg-barber:server:SaveSkin", CreatorCache, male)
+        TriggerServerEvent('rsg-barber:server:SaveSkin', CreatorCache, male)
 
         RenderScriptCams(false, true, 1000, true, true)
         SetCamActive(cam, false)
@@ -123,7 +123,7 @@ local MainMenus =
         local currentHealth = GetEntityHealth(PlayerPedId())
         local maxStamina = Citizen.InvokeNative(0xCB42AFE2B613EE55, PlayerPedId(), Citizen.ResultAsFloat())
         local currentStamina = Citizen.InvokeNative(0x775A1CA7893AA8B5, PlayerPedId(), Citizen.ResultAsFloat()) / maxStamina * 100
-        TriggerServerEvent("rsg-appearance:LoadSkin")
+        TriggerServerEvent('rsg-appearance:server:LoadSkin')
         Wait(1000)
         SetEntityHealth(PlayerPedId(), currentHealth )
         Citizen.InvokeNative(0xC3D4B754C0E86B9E, PlayerPedId(), currentStamina)
@@ -178,7 +178,7 @@ function MainMenu(Target)
         local currentHealth = GetEntityHealth(PlayerPedId())
         local maxStamina = Citizen.InvokeNative(0xCB42AFE2B613EE55, PlayerPedId(), Citizen.ResultAsFloat())
         local currentStamina = Citizen.InvokeNative(0x775A1CA7893AA8B5, PlayerPedId(), Citizen.ResultAsFloat()) / maxStamina * 100
-        TriggerServerEvent("rsg-appearance:LoadSkin")
+        TriggerServerEvent('rsg-appearance:server:LoadSkin')
         Wait(1000)
         SetEntityHealth(PlayerPedId(), currentHealth )
         Citizen.InvokeNative(0xC3D4B754C0E86B9E, PlayerPedId(), currentStamina)
@@ -501,10 +501,6 @@ function ApplyOverlays(overlayTarget)
     Citizen.InvokeNative(0x8472A1789478F82F, textureId) -- reset texture
     Citizen.InvokeNative(0x0B46E25761519058, overlayTarget, GetHashKey("heads"), textureId) -- apply texture to current component in category "heads"
     Citizen.InvokeNative(0xCC8CA3E88256E58F, overlayTarget, 0, 1, 1, 1, false); -- refresh ped components
-    -- --print(PlayerPedId() , overlayTarget)
-    -- Citizen.InvokeNative(0x0B46E25761519058, overlayTarget, GetHashKey("heads"), textureId) -- apply texture to current component in category "heads"
-    -- Citizen.InvokeNative(0x92DAABA2C1C10B0E, textureId) -- update texture
-    -- Citizen.InvokeNative(0xCC8CA3E88256E58F, overlayTarget, 0, 1, 1, 1, false); -- refresh ped components
 end
 
 function LoadOverlays(target, data)

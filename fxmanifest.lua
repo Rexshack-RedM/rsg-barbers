@@ -3,14 +3,14 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 game 'rdr3'
 
 description 'rsg-barbers'
-version '1.0.7'
+version '1.0.8'
 
 shared_scripts {
     '@rsg-core/shared/locale.lua',    
     'locales/en.lua',
     'locales/*.lua',
-    "config.lua",
-    "hairs.lua",
+    'config.lua',
+    'hairs.lua',
     'overlays.lua',
 }
 
@@ -19,8 +19,9 @@ client_scripts {
 }
 
 server_scripts {
-    "@mysql-async/lib/MySQL.lua",
-    "server/server.lua"
+    '@mysql-async/lib/MySQL.lua',
+    'server/server.lua',
+    'server/versionchecker.lua'
 }
 
 dependencies {
