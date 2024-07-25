@@ -150,7 +150,7 @@ function MainMenu(Target)
         {label = Config.Texts.save,       value = 'save',   desc = ""}
     }
     MenuData.Open('default', GetCurrentResourceName(), 'main_character_creator_menu',
-        { 
+        {
             title = Lang:t('menu.barber_shop'),
             subtext = Config.Texts.Options,
             align = Config.Texts.align,
@@ -201,7 +201,7 @@ function OpenHairMenu()
             CreatorCache["beard"] = {}
             CreatorCache["beard"].model = CreatorCache["beard"].model
             CreatorCache["beard"].texture = CreatorCache["beard"].texture
-            
+
         end
         local options = {}
         -- male hair selection
@@ -360,7 +360,7 @@ function LoadHair(target, data)
                 if tonumber(data.hair.model) > 0 then
                     if IsPedMale(target) then
                         if hairs_list["male"]["hair"][tonumber(data.hair.model)] ~= nil then
-                            if hairs_list["male"]["hair"][tonumber(data.hair.model)][tonumber(data.hair.texture)] ~= nil then       
+                            if hairs_list["male"]["hair"][tonumber(data.hair.model)][tonumber(data.hair.texture)] ~= nil then
                                 local hair = hairs_list["male"]["hair"][tonumber(data.hair.model)][tonumber(data.hair.texture)].hash
                                 NativeSetPedComponentEnabled(target, tonumber(hair), false, true, true)
                             end
