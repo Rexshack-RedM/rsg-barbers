@@ -6,7 +6,7 @@ description 'rsg-barbers'
 version '1.0.8'
 
 shared_scripts {
-    '@rsg-core/shared/locale.lua',    
+    '@rsg-core/shared/locale.lua',
     'locales/en.lua',
     'locales/*.lua',
     'config.lua',
