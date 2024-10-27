@@ -144,27 +144,11 @@ function MainMenu(Target)
     MenuData.CloseAll()
     local _Target = Target or PlayerPedId()
     local elements = {
-        {
-            label = locale('cl_hair_beard'), value = 'hair',   desc = "",
-            onClick = function(currentData)
-                MainMenus["hair"]()
-            end
-        },
-        {
-            label = locale('cl_makeup'),
-            value = 'makeup', desc = "",
-            onClick = function(currentData)
-                MainMenus['makeup']()
-            end
-        },
-        {
-            label = locale('cl_save'),
-            value = 'save',   desc = "",
-            onClick = function(currentData)
-                MainMenus['save']()
-            end
-        }
+        { label = locale('cl_hair_beard'), value = 'hair',   desc = "" },
+        { label = locale('cl_makeup'), value = 'makeup', desc = ""},
+        { label = locale('cl_save'), value = 'save',   desc = "" }
     }
+
     local resource = GetCurrentResourceName()
     MenuData.Open('default', resource, 'main_character_creator_menu',
         { title = locale('cl_barber_shop'), subtext = locale('cl_options'), align = locale('cl_align'), elements = elements },
