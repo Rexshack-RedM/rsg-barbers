@@ -19,27 +19,10 @@ end)
 CreateThread(function()
     for k, v in pairs(Config.barberlocations) do
         if not Config.UseTarget then
-            exports['rsg-core']:createPrompt(v.name, v.coords, RSGCore.Shared.Keybinds[Config.Key], locale('cl_open_barber'), {
+            exports['rsg-core']:createPrompt(v.id, v.coords, RSGCore.Shared.Keybinds[Config.Key], locale('cl_open_barber'), {
                 type = 'client',
                 event = 'rsg-barber:client:menu',
-                args = { v.location },
-            })
-        else
-            exports['rsg-target']:AddCircleZone(v.name, v.coords, 1, {
-                name = v.name,
-                debugPoly = false,
-                }, {
-                    options = {
-                    {
-                        type = "client",
-                        action = function()
-                        TriggerEvent('rsg-barber:client:menu', v.location)
-                        end,
-                        icon = "fas fa-shopping-basket",
-                        label = locale('cl_open_barber'),
-                    },
-                },
-                distance = 4.0,
+                args = { v.id },
             })
         end
         if v.showblip then
@@ -52,7 +35,7 @@ CreateThread(function()
     end
 end)
 
-RegisterNetEvent("rsg-barber:client:menu", function()
+RegisterNetEvent("rsg-barber:client:menu", function(id)
     local playerCoords = GetEntityCoords(cache.ped)
     local camFov = GetGameplayCamFov()
     local seat = GetHashKey("PROP_PLAYER_BARBER_SEAT")
@@ -60,7 +43,7 @@ RegisterNetEvent("rsg-barber:client:menu", function()
     for i = 1, #Config.barberlocations do
         local loc = Config.barberlocations[i]
 
-        if #(playerCoords - loc.coords) < 2 then
+        if #(playerCoords - loc.coords) < 2 and loc.id == id then
             Citizen.InvokeNative(0x4D1F61FC34AF3CD1, cache.ped, seat, loc.seat, 0, 0, 1)
 
             camPos = loc.camPos

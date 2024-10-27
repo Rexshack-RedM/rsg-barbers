@@ -7,11 +7,17 @@ Config.Key = 'J'
 Config.UseTarget = false
 Config.BarberCost = 5
 
+Config.DistanceSpawn = 20.0 -- Distance before spawning/despawning the ped. (GTA Units.)
+Config.FadeIn = true
+
 Config.barberlocations =
 {
     [1] =
     {
         name = "Valentine",
+        id = "val-barber",
+        npcmodel = `s_m_m_barber_01`,
+        npccoords = vector4(-307.96, 814.16, 118.99, 190.93),
         coords = vector3(-307.96, 814.16, 118.99),
         seat = vector4(-306.62, 813.56, 118.75, 90.60),
         camPos = vector3(-307.35, 813.45, 119.61),
@@ -22,6 +28,9 @@ Config.barberlocations =
     [2] =
     {
         name = "Saint Denis",
+        id = "std-barber",
+        npcmodel = `s_m_m_barber_01`,
+        npccoords = vector4(2656.16, -1180.87, 53.28, 176.33),
         coords = vector3(2656.16, -1180.87, 53.28),
         seat = vector4(2655.38, -1180.92, 53.00, 182.8),
         camPos = vector3(2655.38, -1181.69, 53.87),
@@ -32,6 +41,9 @@ Config.barberlocations =
     [3] =
     {
         name = "Blackwater",
+        id = "blk-barber",
+        npcmodel = `s_m_m_barber_01`,
+        npccoords = vector4(-815.88, -1364.72, 43.75, 268.01),
         coords = vector3(-815.88, -1364.72, 43.75),
         seat = vector4(-815.17, -1368.75, 43.50, 95.5),
         camPos = vector3(-816.06, -1368.76, 44.26),
