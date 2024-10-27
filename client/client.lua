@@ -9,6 +9,7 @@ local cam = nil
 local camPos = nil
 local camRot = nil
 local lighting = nil
+lib.locale()
 
 MenuData = {}
 TriggerEvent('rsg-menubase:getData',function(call)
@@ -17,51 +18,33 @@ end)
 
 CreateThread(function()
     for k, v in pairs(Config.barberlocations) do
-        if not v.showtarget then
-            exports['rsg-core']:createPrompt(v.name, v.coords, RSGCore.Shared.Keybinds[Config.Key], Lang:t('menu.open_barber'), {
+        if not Config.UseTarget then
+            exports['rsg-core']:createPrompt(v.id, v.coords, RSGCore.Shared.Keybinds[Config.Key], locale('cl_open_barber'), {
                 type = 'client',
                 event = 'rsg-barber:client:menu',
-                args = { v.location },
-            })
-        else
-            exports['rsg-target']:AddCircleZone(v.name, v.coords, 1, {
-                name = v.name,
-                debugPoly = false,
-                }, {
-                    options = {
-                    {
-                        type = "client",
-                        action = function()
-                        TriggerEvent('rsg-barber:client:menu', v.location)
-                        end,
-                        icon = "fas fa-shopping-basket",
-                        label = Lang:t('menu.open_barber'),
-                    },
-                },
-                distance = 4.0,
+                args = { v.id },
             })
         end
         if v.showblip then
-            local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, v.coords)
-            SetBlipSprite(blip, -2090472724, 1)
+            local blip = BlipAddForCoords(1664425300, v.coords)
+            SetBlipSprite(blip, -2090472724, true)
             SetBlipScale(blip, 0.2)
-            Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.name.. Lang:t('menu.barber'))
+            SetBlipName(blip, v.name.. locale('cl_barber'))
             blipEntries[#blipEntries + 1] = {type = "BLIP", handle = blip}
         end
     end
 end)
 
-RegisterNetEvent("rsg-barber:client:menu", function()
-    local ped = PlayerPedId()
-    local playerCoords = GetEntityCoords(ped)
+RegisterNetEvent("rsg-barber:client:menu", function(id)
+    local playerCoords = GetEntityCoords(cache.ped)
     local camFov = GetGameplayCamFov()
     local seat = GetHashKey("PROP_PLAYER_BARBER_SEAT")
 
     for i = 1, #Config.barberlocations do
         local loc = Config.barberlocations[i]
 
-        if #(playerCoords - loc.coords) < 2 then
-            Citizen.InvokeNative(0x4D1F61FC34AF3CD1, ped, seat, loc.seat, 0, 0, 1)
+        if #(playerCoords - loc.coords) < 2 and loc.id == id then
+            Citizen.InvokeNative(0x4D1F61FC34AF3CD1, cache.ped, seat, loc.seat, 0, 0, 1)
 
             camPos = loc.camPos
             camRot = loc.camRot
@@ -69,9 +52,9 @@ RegisterNetEvent("rsg-barber:client:menu", function()
 
             sit = true
 
-            ClearPedTasks(ped)
-            ClearPedSecondaryTask(ped)
-            FreezeEntityPosition(ped, true)
+            ClearPedTasks(cache.ped)
+            ClearPedSecondaryTask(cache.ped)
+            FreezeEntityPosition(cache.ped, true)
 
             MainMenu()
 
@@ -84,8 +67,7 @@ RegisterNetEvent("rsg-barber:client:menu", function()
     end
 end)
 
-local MainMenus =
-{
+local MainMenus = {
     ["hair"] = function()
         OpenHairMenu()
     end,
@@ -145,17 +127,15 @@ function MainMenu(Target)
     MenuData.CloseAll()
     local _Target = Target or PlayerPedId()
     local elements = {
-        {label = Config.Texts.Hair_beard, value = 'hair',   desc = ""},
-        {label = Config.Texts.Makeup,     value = 'makeup', desc = ""},
-        {label = Config.Texts.save,       value = 'save',   desc = ""}
+        { label = locale('cl_hair_beard'), value = 'hair',   desc = "" },
+        { label = locale('cl_makeup'), value = 'makeup', desc = ""},
+        { label = locale('cl_save'), value = 'save',   desc = "" }
     }
-    MenuData.Open('default', GetCurrentResourceName(), 'main_character_creator_menu',
-        {
-            title = Lang:t('menu.barber_shop'),
-            subtext = Config.Texts.Options,
-            align = Config.Texts.align,
-            elements = elements
-        }, function(data, menu)
+
+    local resource = GetCurrentResourceName()
+    MenuData.Open('default', resource, 'main_character_creator_menu',
+        { title = locale('cl_barber_shop'), subtext = locale('cl_options'), align = locale('cl_align'), elements = elements },
+        function(data, menu)
         MainMenus[data.current.value]()
         end, function(data, menu)
             menu.close()
@@ -201,35 +181,35 @@ function OpenHairMenu()
             CreatorCache["beard"] = {}
             CreatorCache["beard"].model = CreatorCache["beard"].model
             CreatorCache["beard"].texture = CreatorCache["beard"].texture
-
         end
+
         local options = {}
         -- male hair selection
         local category = hairs_list["male"]["hair"]
         for k, v in pairs(category) do
-            table.insert(options, Config.Texts.Style .. k)
+            table.insert(options, locale('cl_style') .. ' '.. k)
         end
-        table.insert(elements, {label = Config.Texts.HairStyle, value = CreatorCache["hair"].model or 0, category = "hair", desc = "", type = "slider", min = 0, max = #category, change_type = "model", id = a, options = options})
+        table.insert(elements, {label = locale('cl_hair_style'), value = CreatorCache["hair"].model or 0, category = "hair", desc = "", type = "slider", min = 0, max = #category, change_type = "model", id = a, options = options})
         a = a + 1
         options = {}
         for i = 1, GetMaxTexturesForModel("hair", CreatorCache["hair"].model or 1), 1 do
-            table.insert(options, Config.Texts.Color .. i)
+            table.insert(options, locale('cl_color').. ' ' .. i)
         end
-        table.insert(elements, {label = Config.Texts.HairColor, value = CreatorCache["hair"].texture or 1, category = "hair", desc = "", type = "slider", min = 1, max = GetMaxTexturesForModel("hair", CreatorCache["hair"].model or 1), change_type = "texture", id = a, options = options})
+        table.insert(elements, {label = locale('cl_hair_color'), value = CreatorCache["hair"].texture or 1, category = "hair", desc = "", type = "slider", min = 1, max = GetMaxTexturesForModel("hair", CreatorCache["hair"].model or 1), change_type = "texture", id = a, options = options})
         options = {}
         a = a + 1
         -- male beard selection
         local category = hairs_list["male"]["beard"]
         for k, v in pairs(category) do
-            table.insert(options, Config.Texts.Style .. k)
+            table.insert(options, locale('cl_style') .. ' ' .. k)
         end
-        table.insert(elements, { label = Config.Texts.BeardStyle, value = CreatorCache["beard"].model or 0, category = "beard", desc = "", type = "slider", min = 0, max = #category, change_type = "model", id = a, options = options})
+        table.insert(elements, { label = locale('cl_beard_style'), value = CreatorCache["beard"].model or 0, category = "beard", desc = "", type = "slider", min = 0, max = #category, change_type = "model", id = a, options = options})
         a = a + 1
         options = {}
         for i = 1, GetMaxTexturesForModel("beard", CreatorCache["beard"].model or 1), 1 do
-            table.insert(options, Config.Texts.Color .. i)
+            table.insert(options, locale('cl_color').. ' ' .. i)
         end
-        table.insert(elements, {label = Config.Texts.BeardColor, value = CreatorCache["beard"].texture or 1, category = "beard", desc = "", type = "slider", min = 1, max = GetMaxTexturesForModel("beard", CreatorCache["beard"].model or 1), change_type = "texture", id = a, options = options})
+        table.insert(elements, {label = locale('cl_beard_color'), value = CreatorCache["beard"].texture or 1, category = "beard", desc = "", type = "slider", min = 1, max = GetMaxTexturesForModel("beard", CreatorCache["beard"].model or 1), change_type = "texture", id = a, options = options})
         options = {}
         a = a + 1
     else
@@ -243,24 +223,24 @@ function OpenHairMenu()
         -- female hair options
         local category = hairs_list["female"]["hair"]
         for k, v in pairs(category) do
-            table.insert(options, Config.Texts.Style .. k)
+            table.insert(options, locale('cl_style') .. ' ' .. k)
         end
         table.insert(elements,
-            {label = Config.Texts.Hair, value = CreatorCache["hair"].model or 0, category = "hair", desc = "", type = "slider", min = 0, max = #category, change_type = "model", id = a, options = options}
+            {label = locale('cl_hair'), value = CreatorCache["hair"].model or 0, category = "hair", desc = "", type = "slider", min = 0, max = #category, change_type = "model", id = a, options = options}
         )
         a = a + 1
         options = {}
         for i = 1, GetMaxTexturesForModel("hair", CreatorCache["hair"].model or 1), 1 do
-            table.insert(options, Config.Texts.HairColor .. i)
+            table.insert(options, locale('cl_hair_color') .. i)
         end
         table.insert(elements,
-            {label = Config.Texts.Hair, value = CreatorCache["hair"].texture or 1, category = "hair", desc = "", type = "slider", min = 1, max = GetMaxTexturesForModel("hair", CreatorCache["hair"].model or 1), change_type = "texture", id = a, options = options}
+            {label = locale('cl_hair'), value = CreatorCache["hair"].texture or 1, category = "hair", desc = "", type = "slider", min = 1, max = GetMaxTexturesForModel("hair", CreatorCache["hair"].model or 1), change_type = "texture", id = a, options = options}
         )
         options = {}
         a = a + 1
     end
     MenuData.Open('default', GetCurrentResourceName(), 'hair_main_character_creator_menu',
-        {title = Config.Texts.Hair_beard, subtext = Config.Texts.Options, align = Config.Texts.align, elements = elements}, function(data, menu)
+        {title = locale('cl_hair_beard'), subtext = locale('cl_options'), align = locale('cl_align'), elements = elements}, function(data, menu)
     end, function(data, menu)
         MainMenu()
     end, function(data, menu)
@@ -272,7 +252,7 @@ function OpenHairMenu()
                     local options = {}
                     if GetMaxTexturesForModel(data.current.category, data.current.value) > 1 then
                         for i = 1, GetMaxTexturesForModel(data.current.category, data.current.value), 1 do
-                            table.insert(options, Config.Texts.Color .. i)
+                            table.insert(options, locale('cl_color').. ' ' .. i)
                         end
                     else
                         table.insert(options, "Brak")
@@ -307,28 +287,29 @@ end
 function OpenMakeupMenu()
     MenuData.CloseAll()
     local elements = {
-        {label = " Stubble Type",               value = CreatorCache["beardstabble_t"] or 1,  category = "beardstabble_t",  desc = "", type = "slider", min = 0, max = 1},
-        {label = " Stabble Opacity",            value = CreatorCache["beardstabble_op"] or 0, category = "beardstabble_op", desc = "", type = "slider", min = 0, max = 100, hop = 10},
-        {label = Config.Texts.Shadow,           value = CreatorCache["shadows_t"] or 1,       category = "shadows_t",       desc = "", type = "slider", min = 1, max = 5},
-        {label = Config.Texts.Clarity,          value = CreatorCache["shadows_op"] or 0,      category = "shadows_op",      desc = "", type = "slider", min = 0, max = 100, hop = 5},
-        {label = Config.Texts.ColorShadow,      value = CreatorCache["shadows_id"] or 1,      category = "shadows_id",      desc = "", type = "slider", min = 1, max = 25},
-        {label = Config.Texts.ColorFirst_Class, value = CreatorCache["shadows_c1"] or 0,      category = "shadows_c1",      desc = "", type = "slider", min = 0, max = 64},
-        {label = Config.Texts.Blushing_Cheek,   value = CreatorCache["blush_t"] or 1,         category = "blush_t",         desc = "", type = "slider", min = 1, max = 4},
-        {label = Config.Texts.Clarity,          value = CreatorCache["blush_op"] or 0,        category = "blush_op",        desc = "", type = "slider", min = 0, max = 100, hop = 5},
-        {label = Config.Texts.blush_id,         value = CreatorCache["blush_id"] or 1,        category = "blush_id",        desc = "", type = "slider", min = 1, max = 25},
-        {label = Config.Texts.blush_c1,         value = CreatorCache["blush_c1"] or 0,        category = "blush_c1",        desc = "", type = "slider", min = 0, max = 64},
-        {label = Config.Texts.Lipstick,         value = CreatorCache["lipsticks_t"] or 1,     category = "lipsticks_t",     desc = "", type = "slider", min = 1, max = 7},
-        {label = Config.Texts.Clarity,          value = CreatorCache["lipsticks_op"] or 0,    category = "lipsticks_op",    desc = "", type = "slider", min = 0, max = 100, hop = 5},
-        {label = Config.Texts.ColorLipstick,    value = CreatorCache["lipsticks_id"] or 1,    category = "lipsticks_id",    desc = "", type = "slider", min = 1, max = 25},
-        {label = Config.Texts.lipsticks_c1,     value = CreatorCache["lipsticks_c1"] or 0,    category = "lipsticks_c1",    desc = "", type = "slider", min = 0, max = 64},
-        {label = Config.Texts.lipsticks_c2,     value = CreatorCache["lipsticks_c2"] or 0,    category = "lipsticks_c2",    desc = "", type = "slider", min = 0, max = 64},
-        {label = Config.Texts.Eyeliners,        value = CreatorCache["eyeliners_t"] or 1,     category = "eyeliners_t",     desc = "", type = "slider", min = 1, max = 15},
-        {label = Config.Texts.Clarity,          value = CreatorCache["eyeliners_op"] or 0,    category = "eyeliners_op",    desc = "", type = "slider", min = 0, max = 100, hop = 5},
-        {label = Config.Texts.eyeliners_id,     value = CreatorCache["eyeliners_id"] or 1,    category = "eyeliners_id",    desc = "", type = "slider", min = 1, max = 25},
-        {label = Config.Texts.eyeliners_c1,     value = CreatorCache["eyeliners_c1"] or 0,    category = "eyeliners_c1",    desc = "", type = "slider", min = 0, max = 64}
+        {label = ' ' .. locale('cl_stubble_type'),        value = CreatorCache["beardstabble_t"] or 1,  category = "beardstabble_t",  desc = "", type = "slider", min = 0, max = 1},
+        {label = ' ' .. locale('cl_stabble_opacity'),     value = CreatorCache["beardstabble_op"] or 0, category = "beardstabble_op", desc = "", type = "slider", min = 0, max = 100, hop = 10},
+        {label = locale('cl_shadow'),                     value = CreatorCache["shadows_t"] or 1,       category = "shadows_t",       desc = "", type = "slider", min = 1, max = 5},
+        {label = locale('cl_clarity'),                    value = CreatorCache["shadows_op"] or 0,      category = "shadows_op",      desc = "", type = "slider", min = 0, max = 100, hop = 5},
+        {label = locale('cl_color_shadow'),               value = CreatorCache["shadows_id"] or 1,      category = "shadows_id",      desc = "", type = "slider", min = 1, max = 25},
+        {label = locale('cl_color_first_class_delusion'), value = CreatorCache["shadows_c1"] or 0,      category = "shadows_c1",      desc = "", type = "slider", min = 0, max = 64},
+        {label = locale('cl_blushing_cheek'),             value = CreatorCache["blush_t"] or 1,         category = "blush_t",         desc = "", type = "slider", min = 1, max = 4},
+        {label = locale('cl_clarity'),                    value = CreatorCache["blush_op"] or 0,        category = "blush_op",        desc = "", type = "slider", min = 0, max = 100, hop = 5},
+        {label = locale('cl_cl_cheek_blush_color'),       value = CreatorCache["blush_id"] or 1,        category = "blush_id",        desc = "", type = "slider", min = 1, max = 25},
+        {label = locale('cl_color_first_degree_cheek_redness'),         value = CreatorCache["blush_c1"] or 0,        category = "blush_c1",        desc = "", type = "slider", min = 0, max = 64},
+        {label = locale('cl_type_lipstick'),              value = CreatorCache["lipsticks_t"] or 1,     category = "lipsticks_t",     desc = "", type = "slider", min = 1, max = 7},
+        {label = locale('cl_clarity'),                    value = CreatorCache["lipsticks_op"] or 0,    category = "lipsticks_op",    desc = "", type = "slider", min = 0, max = 100, hop = 5},
+        {label = locale('cl_color_lipstick'),             value = CreatorCache["lipsticks_id"] or 1,    category = "lipsticks_id",    desc = "", type = "slider", min = 1, max = 25},
+        {label = locale('cl_first_class_color_ipstick'),  value = CreatorCache["lipsticks_c1"] or 0,    category = "lipsticks_c1",    desc = "", type = "slider", min = 0, max = 64},
+        {label = locale('cl_second_color_lipstick'),      value = CreatorCache["lipsticks_c2"] or 0,    category = "lipsticks_c2",    desc = "", type = "slider", min = 0, max = 64},
+        {label = locale('cl_eyeliners'),                  value = CreatorCache["eyeliners_t"] or 1,     category = "eyeliners_t",     desc = "", type = "slider", min = 1, max = 15},
+        {label = locale('cl_clarity'),                    value = CreatorCache["eyeliners_op"] or 0,    category = "eyeliners_op",    desc = "", type = "slider", min = 0, max = 100, hop = 5},
+        {label = locale('cl_color_eyeliners'),            value = CreatorCache["eyeliners_id"] or 1,    category = "eyeliners_id",    desc = "", type = "slider", min = 1, max = 25},
+        {label = locale('cl_color_main_eyeliners'),       value = CreatorCache["eyeliners_c1"] or 0,    category = "eyeliners_c1",    desc = "", type = "slider", min = 0, max = 64}
     }
-    MenuData.Open('default', GetCurrentResourceName(), 'makeup_character_creator_menu',
-        {title = Config.Texts.Make_up, subtext = Config.Texts.Options, align = Config.Texts.align, elements = elements}, function(data, menu)
+    local resource = GetCurrentResourceName()
+    MenuData.Open('default', resource, 'makeup_character_creator_menu',
+        {title = locale('cl_make_up'), subtext = locale('cl_options'), align = locale('cl_align'), elements = elements}, function(data, menu)
     end, function(data, menu)
         MainMenu()
     end, function(data, menu)
@@ -338,7 +319,6 @@ function OpenMakeupMenu()
         end
     end)
 end
-
 
 function GetMaxTexturesForModel(category, model)
     -- print(model)
@@ -360,16 +340,15 @@ function LoadHair(target, data)
                 if tonumber(data.hair.model) > 0 then
                     if IsPedMale(target) then
                         if hairs_list["male"]["hair"][tonumber(data.hair.model)] ~= nil then
-                            if hairs_list["male"]["hair"][tonumber(data.hair.model)][tonumber(data.hair.texture)] ~= nil then
+                            if hairs_list["male"]["hair"][tonumber(data.hair.model)][tonumber(data.hair.texture)] ~= nil then       
                                 local hair = hairs_list["male"]["hair"][tonumber(data.hair.model)][tonumber(data.hair.texture)].hash
                                 NativeSetPedComponentEnabled(target, tonumber(hair), false, true, true)
                             end
                         end
                     else
                         if hairs_list["female"]["hair"][tonumber(data.hair.model)] ~= nil then
-                            if hairs_list["female"]["hair"][tonumber(data.hair.model)][tonumber(data.hair.texture)] ~=
-                                nil then
-                                    local hair = hairs_list["female"]["hair"][tonumber(data.hair.model)][tonumber(data.hair.texture)].hash
+                            if hairs_list["female"]["hair"][tonumber(data.hair.model)][tonumber(data.hair.texture)] ~= nil then
+                                local hair = hairs_list["female"]["hair"][tonumber(data.hair.model)][tonumber(data.hair.texture)].hash
                                 NativeSetPedComponentEnabled(target, tonumber(hair), false, true, true)
                             end
                         end
@@ -390,9 +369,8 @@ function LoadBeard(target, data)
                 if tonumber(data.beard.model) > 0 then
                     if IsPedMale(target) then
                         if hairs_list["male"]["beard"][tonumber(data.beard.model)] ~= nil then
-                            if hairs_list["male"]["beard"][tonumber(data.beard.model)][tonumber(data.beard.texture)] ~=
-                                nil then
-                                    local beard = hairs_list["male"]["beard"][tonumber(data.beard.model)][tonumber(data.beard.texture)].hash
+                            if hairs_list["male"]["beard"][tonumber(data.beard.model)][tonumber(data.beard.texture)] ~= nil then
+                                local beard = hairs_list["male"]["beard"][tonumber(data.beard.model)][tonumber(data.beard.texture)].hash
                                 NativeSetPedComponentEnabled(target, tonumber(beard), false, true, true)
                             end
                         end
@@ -438,8 +416,8 @@ function NativeUpdatePedVariation(ped)
     end
 end
 
-function ChangeOverlays(name, visibility, tx_id, tx_normal, tx_material, tx_color_type, tx_opacity, tx_unk, palette_id,
-    palette_color_primary, palette_color_secondary, palette_color_tertiary, var, opacity)
+function ChangeOverlays(name, visibility, tx_id, tx_normal, tx_material, tx_color_type, tx_opacity, tx_unk, palette_id, palette_color_primary, palette_color_secondary, palette_color_tertiary, var, opacity)
+
     for k, v in pairs(overlay_all_layers) do
         if v.name == name then
             v.visibility = visibility
@@ -506,56 +484,45 @@ end
 function LoadOverlays(target, data)
 
     if tonumber(data.eyebrows_t) ~= nil and tonumber(data.eyebrows_op) ~= nil then
-        ChangeOverlays("eyebrows", 1, tonumber(data.eyebrows_t), 0, 0, 0, 1.0, 0, tonumber(data.eyebrows_id) or 1,
-            tonumber(data.eyebrows_c1) or 0, 0, 0, 0, tonumber(data.eyebrows_op / 100))
+        ChangeOverlays("eyebrows", 1, tonumber(data.eyebrows_t), 0, 0, 0, 1.0, 0, tonumber(data.eyebrows_id) or 1, tonumber(data.eyebrows_c1) or 0, 0, 0, 0, tonumber(data.eyebrows_op / 100))
     else
         ChangeOverlays("eyebrows", 1, 1, 0, 0, 0, 1.0, 0, 10, 0, 0, 0, 0, 1.0)
     end
 
     if tonumber(data.scars_t) ~= nil and tonumber(data.scars_op) ~= nil then
-        ChangeOverlays("scars", 1, tonumber(data.scars_t), 0, 0, 1, 1.0, 0, tonumber(0), 0, 0, 0, tonumber(0),
-            tonumber(data.scars_op / 100))
+        ChangeOverlays("scars", 1, tonumber(data.scars_t), 0, 0, 1, 1.0, 0, tonumber(0), 0, 0, 0, tonumber(0), tonumber(data.scars_op / 100))
     end
 
     if tonumber(data.ageing_t) ~= nil and tonumber(data.ageing_op) ~= nil then
-        ChangeOverlays("ageing", 1, tonumber(data.ageing_t), 0, 0, 1, 1.0, 0, tonumber(0), 0, 0, 0, tonumber(0),
-            tonumber(data.ageing_op / 100))
+        ChangeOverlays("ageing", 1, tonumber(data.ageing_t), 0, 0, 1, 1.0, 0, tonumber(0), 0, 0, 0, tonumber(0), tonumber(data.ageing_op / 100))
     end
 
     if tonumber(data.freckles_t) ~= nil and tonumber(data.freckles_op) ~= nil then
-        ChangeOverlays("freckles", 1, tonumber(data.freckles_t), 0, 0, 1, 1.0, 0, tonumber(0), 0, 0, 0, tonumber(0),
-            tonumber(data.freckles_op / 100))
+        ChangeOverlays("freckles", 1, tonumber(data.freckles_t), 0, 0, 1, 1.0, 0, tonumber(0), 0, 0, 0, tonumber(0), tonumber(data.freckles_op / 100))
     end
 
     if tonumber(data.moles_t) ~= nil and tonumber(data.moles_op) ~= nil then
-        ChangeOverlays("moles", 1, tonumber(data.moles_t), 0, 0, 1, 1.0, 0, tonumber(0), 0, 0, 0, tonumber(0),
-            tonumber(data.moles_op / 100))
+        ChangeOverlays("moles", 1, tonumber(data.moles_t), 0, 0, 1, 1.0, 0, tonumber(0), 0, 0, 0, tonumber(0), tonumber(data.moles_op / 100))
     end
 
     if tonumber(data.spots_t) ~= nil and tonumber(data.spots_op) ~= nil then
-        ChangeOverlays("spots", 1, tonumber(data.spots_t), 0, 0, 1, 1.0, 0, tonumber(0), 0, 0, 0, tonumber(0),
-            tonumber(data.spots_op / 100))
+        ChangeOverlays("spots", 1, tonumber(data.spots_t), 0, 0, 1, 1.0, 0, tonumber(0), 0, 0, 0, tonumber(0), tonumber(data.spots_op / 100))
     end
 
     if tonumber(data.eyeliners_t) ~= nil and tonumber(data.eyeliners_op) ~= nil then
-        ChangeOverlays("eyeliners", 1, 1, 0, 0, 0, 1.0, 0, tonumber(data.eyeliners_id) or 1,
-            tonumber(data.eyeliners_c1) or 0, 0, 0, tonumber(data.eyeliners_t), tonumber(data.eyeliners_op / 100))
+        ChangeOverlays("eyeliners", 1, 1, 0, 0, 0, 1.0, 0, tonumber(data.eyeliners_id) or 1, tonumber(data.eyeliners_c1) or 0, 0, 0, tonumber(data.eyeliners_t), tonumber(data.eyeliners_op / 100))
     end
 
     if tonumber(data.shadows_t) ~= nil and tonumber(data.shadows_op) ~= nil then
-        ChangeOverlays("shadows", 1, tonumber(1), 0, 0, 0, 1.0, 0, tonumber(data.shadows_id) or 1,
-            tonumber(data.shadows_c1) or 0, 0, 0, tonumber(data.shadows_t), tonumber(data.shadows_op / 100))
+        ChangeOverlays("shadows", 1, tonumber(1), 0, 0, 0, 1.0, 0, tonumber(data.shadows_id) or 1, tonumber(data.shadows_c1) or 0, 0, 0, tonumber(data.shadows_t), tonumber(data.shadows_op / 100))
     end
 
     if tonumber(data.lipsticks_t) ~= nil and tonumber(data.lipsticks_op) ~= nil then
-        ChangeOverlays("lipsticks", 1, 1, 0, 0, 0, 1.0, 0, tonumber(data.lipsticks_id) or 1,
-            tonumber(data.lipsticks_c1) or 0, tonumber(data.lipsticks_c2) or 0, 0, tonumber(data.lipsticks_t),
-            tonumber(data.lipsticks_op / 100))
+        ChangeOverlays("lipsticks", 1, 1, 0, 0, 0, 1.0, 0, tonumber(data.lipsticks_id) or 1, tonumber(data.lipsticks_c1) or 0, tonumber(data.lipsticks_c2) or 0, 0, tonumber(data.lipsticks_t), tonumber(data.lipsticks_op / 100))
     end
 
     if tonumber(data.blush_t) ~= nil and tonumber(data.blush_op) ~= nil then
-        ChangeOverlays("blush", 1, tonumber(data.blush_t), 0, 0, 0, 1.0, 0, tonumber(data.blush_id) or 1,
-            tonumber(data.blush_c1) or 0, 0, 0, 0, tonumber(data.blush_op / 100))
+        ChangeOverlays("blush", 1, tonumber(data.blush_t), 0, 0, 0, 1.0, 0, tonumber(data.blush_id) or 1, tonumber(data.blush_c1) or 0, 0, 0, 0, tonumber(data.blush_op / 100))
     end
 
     if tonumber(data.beardstabble_t) ~= nil and tonumber(data.beardstabble_op) ~= nil then
@@ -585,7 +552,8 @@ end)
 
 -- Cleanup
 AddEventHandler("onResourceStop", function(resourceName)
-    if GetCurrentResourceName() ~= resourceName then return end
+    local resourcename = GetCurrentResourceName()
+    if resourcename ~= resourceName then return end
 
     MenuData.CloseAll()
 

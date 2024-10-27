@@ -10,7 +10,7 @@ AddEventHandler('rsg-barber:server:SaveSkin', function(CreatorCache, gender)
     local money = player.Functions.GetMoney('cash')
 
     if money < price then
-        TriggerClientEvent('ox_lib:notify', src, {title = Lang:t('error.error_1'), description = Lang:t('error.error_2'), type = 'error' })
+        TriggerClientEvent('ox_lib:notify', src, {title = locale('sv_error_1'), description = locale('sv_error_2'), type = 'error' })
         return
     end
 
@@ -138,6 +138,6 @@ AddEventHandler('rsg-barber:server:SaveSkin', function(CreatorCache, gender)
 
     player.Functions.RemoveMoney('cash', price)
 
-    TriggerClientEvent('ox_lib:notify', src, {title = Lang:t('success.success_1'), description = Lang:t('success.success_2'), type = 'success' })
+    TriggerClientEvent('ox_lib:notify', src, {title = locale('sv_success_1'), description = locale('sv_success_2'), type = 'success' })
 
 end)

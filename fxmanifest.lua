@@ -6,16 +6,14 @@ description 'rsg-barbers'
 version '1.0.9'
 
 shared_scripts {
-    '@rsg-core/shared/locale.lua',
-    'locales/en.lua',
-    'locales/*.lua',
+    '@ox_lib/init.lua',
     'config.lua',
     'hairs.lua',
     'overlays.lua',
 }
 
 client_scripts {
-    "client/client.lua",
+    'client/*.lua',
 }
 
 server_scripts {
@@ -24,10 +22,14 @@ server_scripts {
     'server/versionchecker.lua'
 }
 
+files {
+    'locales/*.json',
+}
+
 dependencies {
     'rsg-core',
     'rsg-menubase',
-    'rsg-npcs'
+    'ox_lib'
 }
 
 lua54 'yes'

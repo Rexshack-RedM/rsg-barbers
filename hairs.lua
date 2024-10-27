@@ -9431,7 +9431,7 @@ hairs_list = {
                     ['ped_type'] = 'male'
                 },
             }
-
+    
         },
         ['hair'] = {
             [1] = {
