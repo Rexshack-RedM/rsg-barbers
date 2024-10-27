@@ -6,22 +6,24 @@ description 'rsg-barbers'
 version '1.0.9'
 
 shared_scripts {
-    '@rsg-core/shared/locale.lua',
-    'locales/en.lua',
-    'locales/*.lua',
+    '@ox_lib/init.lua',
     'config.lua',
     'hairs.lua',
     'overlays.lua',
 }
 
 client_scripts {
-    "client/client.lua",
+    'client/client.lua',
 }
 
 server_scripts {
     '@mysql-async/lib/MySQL.lua',
     'server/server.lua',
     'server/versionchecker.lua'
+}
+
+files {
+    'locales/*.json',
 }
 
 dependencies {
