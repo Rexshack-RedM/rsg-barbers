@@ -1,4 +1,5 @@
 local RSGCore = exports['rsg-core']:GetCoreObject()
+lib.locale()
 
 RegisterServerEvent('rsg-barber:server:SaveSkin')
 AddEventHandler('rsg-barber:server:SaveSkin', function(CreatorCache, gender)
