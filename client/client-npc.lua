@@ -47,7 +47,7 @@ CreateThread(function()
                                     label = locale('cl_open_barber'),
                                     targeticon = 'fa-solid fa-eye',
                                     action = function()
-                                        TriggerEvent('rsg-barber:client:menu', self.id)
+                                        TriggerEvent('rsg-barber:client:menu', v.id)
                                     end
                                 },
                             },
