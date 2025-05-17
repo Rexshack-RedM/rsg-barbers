@@ -18,7 +18,7 @@ end)
 
 CreateThread(function()
     for k, v in pairs(Config.barberlocations) do
-        if not Config.UseTarget then
+        if not Config.EnableTarget then
             exports['rsg-core']:createPrompt(v.id, v.coords, RSGCore.Shared.Keybinds[Config.Key], locale('cl_open_barber'), {
                 type = 'client',
                 event = 'rsg-barber:client:menu',
