@@ -1,8 +1,12 @@
 local spawnedPeds = {}
 lib.locale()
 
-local function NearNPC(npcmodel, npccoords, heading)
-    local spawnedPed = CreatePed(npcmodel, npccoords.x, npccoords.y, npccoords.z - 1.0, heading, false, false, 0, 0)
+local function NearNPC(npcmodel, npccoords, id)
+    RequestModel(npcmodel)
+    while not HasModelLoaded(npcmodel) do
+        Wait(50)
+    end
+    local spawnedPed = CreatePed(npcmodel, npccoords.x, npccoords.y, npccoords.z - 1.0, npccoords.w, false, false, 0, 0)
     SetEntityAlpha(spawnedPed, 0, false)
     SetRandomOutfitVariation(spawnedPed, true)
     SetEntityCanBeDamaged(spawnedPed, false)
@@ -18,61 +22,46 @@ local function NearNPC(npcmodel, npccoords, heading)
         end
     end
 
+    if Config.EnableTarget then
+        local options = {}
+        options[#options+1] = {
+            name = 'npc_barberloc',
+            icon = 'far fa-eye',
+            label = locale('cl_open_barber'),
+            onSelect = function()
+                TriggerEvent('rsg-barber:client:menu', id)
+            end,
+            distance = 2.0
+        }
+
+        exports.ox_target:addLocalEntity(spawnedPed, options)
+    end
     return spawnedPed
 end
 
 CreateThread(function()
-    for k,v in pairs(Config.barberlocations) do
-        local coords = v.npccoords
-        local newpoint = lib.points.new({
-            coords = coords,
-            heading = coords.w,
-            distance = Config.DistanceSpawn,
-            model = v.npcmodel,
-            id = v.id,
-            ped = nil
-        })
+    while true do
+        Wait(500)
+        for k,v in pairs(Config.barberlocations) do
+            local playerCoords = GetEntityCoords(PlayerPedId())
+            local distance = #(playerCoords - v.npccoords.xyz)
 
-        newpoint.onEnter = function(self)
-            if not self.ped then
-                lib.requestModel(self.model, 10000)
-                self.ped = NearNPC(self.model, self.coords, self.heading)
+            if distance < Config.DistanceSpawn and not spawnedPeds[k] then
+                local spawnedPed = NearNPC(v.npcmodel, v.npccoords, v.id )
+                spawnedPeds[k] = { spawnedPed = spawnedPed }
 
-                pcall(function ()
-                    if Config.UseTarget then
-                        exports['rsg-target']:AddTargetEntity(self.ped, {
-                            options = {
-                                {
-                                    icon = 'fa-solid fa-eye',
-                                    label = locale('cl_open_barber'),
-                                    targeticon = 'fa-solid fa-eye',
-                                    action = function()
-                                        TriggerEvent('rsg-barber:client:menu', self.id)
-                                    end
-                                },
-                            },
-                            distance = 2.0,
-                        })
-                    end
-                end)
             end
-        end
-
-        newpoint.onExit = function(self)
-            exports['rsg-target']:RemoveTargetEntity(self.ped, locale('cl_open_barber'))
-            if self.ped and DoesEntityExist(self.ped) then
+            if distance >= Config.DistanceSpawn and spawnedPeds[k] then
                 if Config.FadeIn then
                     for i = 255, 0, -51 do
                         Wait(50)
-                        SetEntityAlpha(self.ped, i, false)
+                        SetEntityAlpha(spawnedPeds[k].spawnedPed, i, false)
                     end
                 end
-                DeleteEntity(self.ped)
-                self.ped = nil
+                DeletePed(spawnedPeds[k].spawnedPed)
+                spawnedPeds[k] = nil
             end
         end
-
-        spawnedPeds[k] = newpoint
     end
 end)
 
