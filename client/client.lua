@@ -17,12 +17,12 @@ TriggerEvent('rsg-menubase:getData',function(call)
 end)
 
 CreateThread(function()
-    for k, v in pairs(Config.barberlocations) do
+    for k, v in pairs(Config.BarberLocations) do
         if not Config.UseTarget then
-            exports['rsg-core']:createPrompt(v.id, v.coords, RSGCore.Shared.Keybinds[Config.Key], locale('cl_open_barber'), {
+            exports['rsg-core']:createPrompt(v.barberid, v.coords, RSGCore.Shared.Keybinds[Config.Key], locale('cl_open_barber'), {
                 type = 'client',
                 event = 'rsg-barber:client:menu',
-                args = { v.id },
+                args = { v.barberid },
             })
         end
         if v.showblip then
@@ -35,15 +35,15 @@ CreateThread(function()
     end
 end)
 
-RegisterNetEvent("rsg-barber:client:menu", function(id)
+RegisterNetEvent("rsg-barber:client:menu", function(barberid)
     local playerCoords = GetEntityCoords(cache.ped)
     local camFov = GetGameplayCamFov()
     local seat = GetHashKey("PROP_PLAYER_BARBER_SEAT")
 
-    for i = 1, #Config.barberlocations do
-        local loc = Config.barberlocations[i]
+    for i = 1, #Config.BarberLocations do
+        local loc = Config.BarberLocations[i]
 
-        if #(playerCoords - loc.coords) < 2 and loc.id == id then
+        if #(playerCoords - loc.coords) < 2 and loc.barberid == barberid then
             Citizen.InvokeNative(0x4D1F61FC34AF3CD1, cache.ped, seat, loc.seat, 0, 0, 1)
 
             camPos = loc.camPos
