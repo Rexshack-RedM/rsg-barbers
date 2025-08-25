@@ -42,8 +42,7 @@ RegisterNetEvent("rsg-barber:client:menu", function(barberid)
 
     for i = 1, #Config.BarberLocations do
         local loc = Config.BarberLocations[i]
-
-        if #(playerCoords - loc.coords) < 2 and loc.barberid == barberid then
+        if #(playerCoords - loc.coords) <= 2.0 and loc.barberid == barberid then
             Citizen.InvokeNative(0x4D1F61FC34AF3CD1, cache.ped, seat, loc.seat, 0, 0, 1)
 
             camPos = loc.camPos

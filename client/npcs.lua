@@ -44,17 +44,19 @@ function NearPed(npcmodel, npccoords, barberid)
             SetEntityAlpha(spawnedPed, i, false)
         end
     end
-    exports.ox_target:addLocalEntity(spawnedPed, {
-        {
-            name = 'npc_barber',
-            icon = 'far fa-eye',
-            label = locale('cl_open_barber'),
-            onSelect = function()
-                TriggerEvent('rsg-barber:client:menu', barberid)
-            end,
-            distance = 3.0
-        },
-    })
+    if Config.UseTarget then
+        exports.ox_target:addLocalEntity(spawnedPed, {
+            {
+                name = 'npc_barber',
+                icon = 'far fa-eye',
+                label = locale('cl_open_barber'),
+                onSelect = function()
+                    TriggerEvent('rsg-barber:client:menu', barberid)
+                end,
+                distance = 2.0
+            },
+        })
+    end
     return spawnedPed
 end
 
