@@ -15,6 +15,10 @@ AddEventHandler('rsg-barber:server:SaveSkin', function(CreatorCache, gender)
         return
     end
 
+    if not next(CreatorCache) then
+        return
+    end
+
     local result = MySQL.Sync.fetchAll('SELECT skin FROM playerskins WHERE citizenid = @citizenid',
     {
         citizenid = citizenid
@@ -37,20 +41,20 @@ AddEventHandler('rsg-barber:server:SaveSkin', function(CreatorCache, gender)
         skin['beard'].texture = 1
     end
 
-    if CreatorCache['hair'].model ~= nil then
+    if CreatorCache['hair']?.model ~= nil then
         skin['hair'].model = tostring(CreatorCache['hair'].model)
     end
 
-    if CreatorCache['hair'].texture ~= nil then
+    if CreatorCache['hair']?.texture ~= nil then
         skin['hair'].texture = tostring(CreatorCache['hair'].texture)
     end
 
     if PedIsMale then
-        if CreatorCache['beard'].model ~= nil then
+        if CreatorCache['beard']?.model ~= nil then
             skin['beard'].model = tostring(CreatorCache['beard'].model)
         end
 
-        if CreatorCache['beard'].texture ~= nil then
+        if CreatorCache['beard']?.texture ~= nil then
             skin['beard'].texture = tostring(CreatorCache['beard'].texture)
         end
     end
