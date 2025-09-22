@@ -1,12 +1,11 @@
 local RSGCore = exports['rsg-core']:GetCoreObject()
 lib.locale()
 
-RegisterServerEvent('rsg-barber:server:SaveSkin')
-AddEventHandler('rsg-barber:server:SaveSkin', function(CreatorCache, gender)
+RegisterServerEvent("rsg-barber:server:SaveSkin")
+AddEventHandler("rsg-barber:server:SaveSkin", function(CreatorCache)
     local src = source
     local player = RSGCore.Functions.GetPlayer(src)
     local citizenid = player.PlayerData.citizenid
-    local PedIsMale = gender
     local price = Config.BarberCost
     local money = player.Functions.GetMoney('cash')
 
@@ -29,35 +28,8 @@ AddEventHandler('rsg-barber:server:SaveSkin', function(CreatorCache, gender)
     local skin = {}
     skin = json.decode(result[1].skin)
 
-    if skin['hair'] == nil then
-        skin['hair'] = {}
-        skin['hair'].model = 0
-        skin['hair'].texture = 1
-    end
-
-    if skin['beard'] == nil then
-        skin['beard'] = {}
-        skin['beard'].model = 0
-        skin['beard'].texture = 1
-    end
-
-    if CreatorCache['hair']?.model ~= nil then
-        skin['hair'].model = tostring(CreatorCache['hair'].model)
-    end
-
-    if CreatorCache['hair']?.texture ~= nil then
-        skin['hair'].texture = tostring(CreatorCache['hair'].texture)
-    end
-
-    if PedIsMale then
-        if CreatorCache['beard']?.model ~= nil then
-            skin['beard'].model = tostring(CreatorCache['beard'].model)
-        end
-
-        if CreatorCache['beard']?.texture ~= nil then
-            skin['beard'].texture = tostring(CreatorCache['beard'].texture)
-        end
-    end
+    skin["hair"] = CreatorCache["hair"] or 0
+    skin["beard"] = CreatorCache["beard"] or 0
 
     if CreatorCache['beardstabble_t'] ~= nil then
         skin['beardstabble_t'] = tostring(CreatorCache['beardstabble_t'])

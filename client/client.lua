@@ -66,6 +66,36 @@ RegisterNetEvent("rsg-barber:client:menu", function(barberid)
     end
 end)
 
+local function ConvertCacheToHash(ClothesCache)
+    local clothesHashes = {}
+    for k, v in pairs(ClothesCache) do
+        if type(v) == "table" then
+            if v.model then
+                local id = tonumber(v.model)
+                if id >= 1 then
+                    local list
+                    if k == "beard" or k == "hair" then
+                        list = hairs_list[IsPedMale(PlayerPedId()) and "male" or "female"][k]
+                    else
+                        list = clothing[IsPedMale(PlayerPedId()) and "male" or "female"][k]
+                    end
+                    if list?[id]?[tonumber(v.texture)] then
+                        clothesHashes[k] = { hash = tonumber(list[id][tonumber(v.texture)].hash) }
+                    end
+                end
+            elseif v.hash then
+                clothesHashes[k] = v
+            else
+                clothesHashes[k] = v
+            end
+        else
+            clothesHashes[k] = v
+        end
+    end
+    return clothesHashes
+end
+
+
 local MainMenus = {
     ["hair"] = function()
         OpenHairMenu()
@@ -78,13 +108,8 @@ local MainMenus = {
 
         LoadedComponents = CreatorCache
         local ped = PlayerPedId()
-        local male = true
 
-        if not IsPedMale(ped) then
-            male = false
-        end
-
-        TriggerServerEvent('rsg-barber:server:SaveSkin', CreatorCache, male)
+        TriggerServerEvent("rsg-barber:server:SaveSkin", ConvertCacheToHash(CreatorCache))
 
         RenderScriptCams(false, true, 1000, true, true)
         SetCamActive(cam, false)
