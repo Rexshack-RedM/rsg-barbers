@@ -72,4 +72,4 @@ The server works out hair and beard hashes itself, checks every makeup value aga
 | Look didn't save | Character needs a `playerskins` row (rsg-character) |
 | Preview stuck | Close and reopen; the cancel path calls `ApplySkin` |
 
-Support: https://buymeacoffee.com/rexshack
+Support the Project : https://rexshack.tebex.store/
